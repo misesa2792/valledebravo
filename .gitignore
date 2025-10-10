@@ -1,0 +1,8 @@
+node_modules
+.env
+.env_prod
+public/archivos
+public/images
+public/mass
+public/file_manager
+public/storage

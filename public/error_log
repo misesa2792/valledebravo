@@ -1,0 +1,1 @@
+[07-Oct-2025 11:01:27 America/Mexico_City] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 69632 bytes) in /home/sesmascom/amanalco/vendor/composer/ClassLoader.php on line 571

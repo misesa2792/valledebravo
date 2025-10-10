@@ -1,0 +1,44 @@
+<form id="saveInfo" method="post" class="form-horizontal">
+
+    <div class="form-group">
+        <label class=" control-label col-md-4 text-left s-16"> Subtema: </label>
+        <div class="col-md-6">
+            <textarea name="descripcion"  rows="6" class="form-control" placeholder="Ingresa Subtema" required></textarea>
+        </div>
+    </div> 
+
+    <article class="col-sm-12 col-md-12 text-center m-t-md m-b-md">
+        <button type="button" data-dismiss="modal" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-left "></i> Cancelar </button>
+        <button type="submit" name="save" class="btn btn-primary btn-sm btnsave"><i class="fa fa-save"></i> Guardar</button>
+    </article>
+</form>
+<script>
+    $("#saveInfo").on("submit", function(e){
+      e.preventDefault();
+      var formData = new FormData(document.getElementById("saveInfo"));
+        $.ajax("{{ URL::to('pdm/savesubtema?idtema='.$idtema) }}", {
+            type: 'post',
+            dataType: "html",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            beforeSend: function(){
+                $(".btnsave").prop("disabled",true).html(btnSaveSpinner);
+            },success: function(res){
+                let row = JSON.parse(res);
+                if(row.success == 'ok'){
+                    $("#sximo-modal").modal("toggle");
+                    query();
+                    toastr.success(mss_tmp.success);
+                }else{
+                    toastr.error(mss_tmp.error);
+                }
+                $(".btnsave").prop("disabled",false).html(btnSave);
+            }, error : function(err){
+                toastr.error(mss_tmp.error);
+                $(".btnsave").prop("disabled",false).html(btnSave);
+            }
+        });
+    });
+</script>
