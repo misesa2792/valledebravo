@@ -20,15 +20,11 @@
 
  <script type="text/javascript">
 
- $('input[type="checkbox"],input[type="radio"]').iCheck({
-	checkboxClass: 'icheckbox_square-green',
-	radioClass: 'iradio_square-green',
-});
 
  $("#saveInfo").on("submit", function(e){
 	e.preventDefault();
 	var formData = new FormData(document.getElementById("saveInfo"));
-	$.ajax("{{ URL::to('usuarios/estatus?k='.$k) }}", {
+	$.ajax("{{ URL::to('usuarios/estatus?id='.$id) }}", {
 		type: 'post',
 		dataType: "html",
 		data: formData,
@@ -39,10 +35,10 @@
 			$(".btnsave").prop("disabled",true).html(btnSaveSpinner);
 		},success: function(res){
 			let row = JSON.parse(res);
-			if(row.success == 'ok'){
+			if(row.status == 'ok'){
 				$("#sximo-modal").modal("toggle");
-				user.activo = row.active;
-				toastr.success(mss_tmp.success);
+				query();
+				toastr.success(row.message);
 			}else{
 				toastr.error(mss_tmp.error);
 			}

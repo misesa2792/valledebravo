@@ -40,6 +40,12 @@
 							</a>
 							</div>
 
+							<div class="col-xs-4 col-sm-3 grid-item">
+							<a href="{{ URL::to('panel/enlaces') }}">
+								<span class="circle bg-ses-green c-white"><span class="fa fa-users"></span></span>
+								<span class="grid-label c-text-alt">Enlaces</span>
+							</a>
+							</div>
 							
 						</div>
 					</div>

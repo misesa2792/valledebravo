@@ -75,7 +75,6 @@ class ReporteController extends Controller {
 		$type = 0;
 		//Accesos a Dependencias
 		$rows = $this->generalService->getAccessDepGenForUsers($idy, $type);
-
 		$this->data['rowData'] = json_encode($rows);
 		$this->data['year'] 			= $modulo[0]->anio;
 		$this->data['ida'] 				= $ida;
@@ -95,7 +94,12 @@ class ReporteController extends Controller {
 		if($decoder == null){
 			return Redirect::to('dashboard')->with('messagetext', 'No se encontro información!')->with('msgstatus','error');
 		}
-		$this->data['rowsMenu'] = $this->generalService->getAccessDepGenForUsersView($decoder);
+        $gp = Auth::user()->group_id;
+        if($gp == 1 || $gp == 2 || $gp == 4){
+			$this->data['rowsMenu'] = $this->generalService->getAccessDepGenForUsersView($decoder);
+		}else{
+			$this->data['rowsMenu'] = [];
+		}
 		$row = $this->model->getInformationDepAuxID($decoder['idac']);
 		//Validamos si tenemos informacion
 		if(count($row) == 0){

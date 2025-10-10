@@ -90,28 +90,72 @@ class GeneralService
         $gp = Auth::user()->group_id;
 		$idi = Auth::user()->idinstituciones;
         $idy = ($idy == 1 ? 2 : $idy);
-        if($gp == 1 || $gp == 2 || $gp == 4 || $gp == 5){
+        if($gp == 1 || $gp == 2 || $gp == 4){
             $rowsDepGen = Sximo::getAreasGeneralForYear($idi, $idy);
+
+			$depaux = $this->getRowsDepAux($idi, $idy, $type);
+			foreach ($rowsDepGen as $v) {
+				if(isset($depaux[$v->idarea])){
+					$data[] = array("ida"		=> $v->idarea,
+									"no"		=> $v->no_dep_gen,
+									"area"		=> $v->dep_gen,
+									"titular"	=> $v->titular,
+									"rows_coor" => $depaux[$v->idarea]
+								);
+				}
+			}
+			return $data;
+
         }else{
 		    $idu = Auth::user()->id;
             $access = Sximo::getPermisoAreaForYearDenGen($idu);
-            if($access[0]->dep_gen != null){
-                $replace = str_replace('"',"'",$access[0]->dep_gen);
-                $rowsDepGen = Sximo::getAreasGeneralForYearDepGen($idi, $idy, $replace);
+            if(count($access) > 0){
+
+				$info = [];
+				foreach ($access as $dg) {
+					if($dg->dep_aux != null){
+						$dep_aux = json_decode($dg->dep_aux);
+						$permisos = implode(',', $dep_aux);
+						//Visualiza todas las dependencias auxiliares de la dep gen
+						foreach (Sximo::getAreasGeneralForYearDepAux($idi, $idy, $type, $dg->dep_gen, $permisos) as $v) {
+							if(!isset($info[$v->idarea])){
+								$info[$v->idarea] = ["ida"		=> $v->idarea,
+													"no"		=> $v->no_dep_gen,
+													"area"		=> $v->dep_gen,
+													"titular"	=> $v->titular
+												];
+							}
+							$info[$v->idarea]["rows_coor"][$v->idac] = ['idac'       => $v->idac, 
+																	'no_dep_aux'    => $v->no_dep_aux, 
+																	'dep_aux'       => $v->dep_aux,
+																	'total'         => 0
+																];
+						}
+
+					}else{
+						//Visualiza todas las dependencias auxiliares de la dep gen
+						foreach (Sximo::getAreasGeneralForYearDepGen($idi, $idy, $type, $dg->dep_gen) as $v) {
+							if(!isset($info[$v->idarea])){
+								$info[$v->idarea] = ["ida"		=> $v->idarea,
+													"no"		=> $v->no_dep_gen,
+													"area"		=> $v->dep_gen,
+													"titular"	=> $v->titular
+												];
+							}
+							$info[$v->idarea]["rows_coor"][$v->idac] = ['idac'       => $v->idac, 
+																	'no_dep_aux'    => $v->no_dep_aux, 
+																	'dep_aux'       => $v->dep_aux,
+																	'total'         => 0
+																];
+						}
+					}
+				}
+				
+				$data = array_values($info);
+				return $data;
             }
         }
-        $depaux = $this->getRowsDepAux($idi, $idy, $type);
-        foreach ($rowsDepGen as $v) {
-            if(isset($depaux[$v->idarea])){
-                $data[] = array("ida"		=> $v->idarea,
-                                "no"		=> $v->no_dep_gen,
-                                "area"		=> $v->dep_gen,
-                                "titular"	=> $v->titular,
-                                "rows_coor" => $depaux[$v->idarea]
-                            );
-            }
-        }
-        return $data;
+		return $data;
     }
 	protected function getRowsDepAux($idi, $idy, $type){
         $data = [];

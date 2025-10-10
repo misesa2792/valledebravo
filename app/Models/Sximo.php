@@ -604,16 +604,32 @@ class Sximo extends Model {
 			where a.idinstituciones = ? and a.idanio = ? and a.estatus = 1 ORDER BY a.numero ASC",[$idi, $idy]);
 	}
 	//OK - Nuevo cambio 11-12-2024 por el cambio de Gaceta 2025 - Para enlaces
-	public static function getAreasGeneralForYearDepGen($idi, $idy, $access){
+	public static function getAreasGeneralForYearDepGen($idi, $idy, $type, $dg){
+			return \DB::select("SELECT ac.idarea_coordinacion as idac,ac.numero as no_dep_aux,ac.descripcion as dep_aux,a.idarea,a.numero as no_dep_gen,a.descripcion as dep_gen,a.titular FROM ui_reporte r 
+			inner join ui_area_coordinacion ac on ac.idarea_coordinacion = r.id_area_coordinacion
+				inner join ui_area a on a.idarea = ac.idarea
+			where r.idinstituciones = {$idi} and r.idanio = {$idy} and r.type = {$type} and a.numero = '{$dg}' ORDER BY a.numero,ac.numero ASC");
+		//Old
 		return \DB::select("SELECT a.idarea,a.numero as no_dep_gen,a.descripcion as dep_gen,a.titular FROM ui_area a
 			inner join ui_instituciones ui on ui.idinstituciones = a.idinstituciones
 			where a.idinstituciones ={$idi} and a.idanio = {$idy} and a.estatus = 1 and a.numero in ({$access}) ORDER BY a.numero ASC");
 	}
+	public static function getAreasGeneralForYearDepAux($idi, $idy, $type, $dg, $da){
+			return \DB::select("SELECT ac.idarea_coordinacion as idac,ac.numero as no_dep_aux,ac.descripcion as dep_aux,a.idarea,a.numero as no_dep_gen,a.descripcion as dep_gen,a.titular FROM ui_reporte r 
+			inner join ui_area_coordinacion ac on ac.idarea_coordinacion = r.id_area_coordinacion
+				inner join ui_area a on a.idarea = ac.idarea
+			where r.idinstituciones = {$idi} and r.idanio = {$idy} and r.type = {$type} and a.numero = '{$dg}' and ac.numero in ({$da}) ORDER BY a.numero,ac.numero ASC");
+	}
 	public static function getPermisoAreaForYearDenGen($idu){
+		return \DB::select("SELECT d.numero AS dep_gen,u.dep_aux FROM ui_user_area u
+		inner join ui_dep_gen d on u.iddep_gen = d.iddep_gen
+		where u.iduser = ? ",[$idu]);
+		//old
 		return \DB::select("SELECT GROUP_CONCAT(CONCAT('\"', d.numero, '\"') SEPARATOR ', ') AS dep_gen FROM ui_user_area u
 		inner join ui_dep_gen d on u.iddep_gen = d.iddep_gen
 		where u.iduser = ? ",[$idu]);
 	}
+	
 	//OK
 	public static function getRowsDepAuxiliares($idi, $idy, $type,$ida){
 		return \DB::select("SELECT ac.idarea_coordinacion as idac,ac.numero as no_dep_aux,ac.descripcion as dep_aux,a.idarea  FROM ui_reporte r

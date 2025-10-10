@@ -120,11 +120,27 @@ class usuarios extends Sximo  {
 		where c.iduser={$id} order by a.numero,ac.numero asc");
 	}
 	public static function getAcccessUserDepGen($idu){
-		return \DB::select("SELECT d.numero as no_dep_gen,d.descripcion as dep_gen FROM ui_user_area u
+		return \DB::select("SELECT u.iduser_area as id,d.numero as no_dep_gen,d.descripcion as dep_gen,u.dep_aux FROM ui_user_area u
 		inner join ui_dep_gen d on u.iddep_gen = d.iddep_gen
 		where u.iduser = {$idu} order by d.numero asc");
 	}
 	public static function getDepGen($idtd){
 		return \DB::select("SELECT iddep_gen as id,numero as no_dep_gen,descripcion as dep_gen FROM ui_dep_gen where idanio = 4 and idtipo_dependencias = {$idtd} order by numero asc");
+	}
+	public static function getDepAuxPorDepGen($idi, $dg){
+		return \DB::select("SELECT info.* FROM (SELECT ac.numero as no_dep_aux,ac.descripcion as dep_aux,a.numero as no_dep_gen FROM ui_reporte r
+			inner join ui_area_coordinacion ac on ac.idarea_coordinacion = r.id_area_coordinacion
+				inner join ui_area a on a.idarea = ac.idarea
+			where r.idinstituciones = {$idi} group by r.id_area_coordinacion) AS info 
+			where info.no_dep_gen='".$dg."'");
+	}
+	public static function getDepAuxView($access){
+		return \DB::select("SELECT numero,descripcion FROM ui_dep_aux where numero in ({$access}) group by numero");
+	}
+	public static function getPermisoAux($id){
+		return \DB::table('ui_user_area as u')
+			->where('u.iduser_area', $id)
+			->select('u.dep_aux')
+			->first();
 	}
 }

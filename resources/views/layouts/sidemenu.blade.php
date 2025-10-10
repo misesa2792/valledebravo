@@ -5,7 +5,7 @@
 				<li class="logo-header bg-white">
 		 			<div class="text-center">
 						<a class="navbar-brand" href="{{ URL::to('dashboard')}}" style="padding: 0;letf:20px;">
-							<img src="{{ asset('mass/images/vb.png')}}" alt="{{ CNF_APPNAME }}" width="220" height="70"/>
+							<img src="{{ asset('mass/images/vb-logo.png')}}" alt="{{ CNF_APPNAME }}" width="220" height="70"/>
 						</a>
 		 			</div>
 				</li>

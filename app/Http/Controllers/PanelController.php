@@ -6,6 +6,7 @@ use App\Models\Panel;
 use App\Models\Access\Years;
 use App\Models\Anios;
 use App\Models\Area;
+use App\Models\Instituciones;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -157,6 +158,19 @@ class PanelController extends Controller {
 			return view('panel.titulares.view',$this->data);
 		}
 		return view('panel.titulares.index',$this->data);
+	}
+	public function getEnlaces( Request $request )
+	{
+		if(Auth::user()->group_id != 1 && Auth::user()->group_id != 2){
+			return Redirect::to('dashboard')->with('messagetext', Lang::get('core.note_restric'))->with('msgstatus','error');
+		}
+		$idi = Auth::user()->idinstituciones;
+		$row = Instituciones::find($idi,['idtipo_dependencias']);
+		$this->data['idi'] = $idi; 
+		$this->data['idtd'] = $row->idtipo_dependencias; 
+		$this->data['pages'] = $this->getNoPaginacion(); 
+		$this->data['rowsNivel'] = [];
+		return view('usuarios.index',$this->data);	
 	}
 	public function getEditartitular( Request $request )
 	{

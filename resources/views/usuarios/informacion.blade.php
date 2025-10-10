@@ -1,23 +1,6 @@
 <form id="saveInfo" method="post" class="form-horizontal">
 
   <div class="col-md-12">
-      <div class="form-group">
-        <div class="col-md-12 text-center m-b">
-          {!! SiteHelpers::avatarUser($row['id'],150) !!}
-         </div>
-         <div class="col-md-3"></div>
-         <div class="col-md-6">
-           <div class="fileinput fileinput-new full-width" data-provides="fileinput">
-               <div class="btn btn-primary btn-file full-width" style="background:transparent;color:var(--color-blue);border-radius:5px;">
-                 <span class="fileinput-new"> <i class="icon-images"></i> &nbsp; Agregar avatar</span><span class="fileinput-exists">Cambiar</span>
-               <input type="file" name="avatar" accept=".jpg, .jpeg, .png">
-             </div>
-               <span class="fileinput-filename"></span>
-               <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">&times;</a>
-           </div>
-         </div>
-         <div class="col-md-3"></div>
-      </div>
 
       <div class="form-group">
         <label class=" control-label col-md-4 text-left s-16 c-text-alt"> Nombre(s) :</label>
@@ -71,7 +54,7 @@
  $("#saveInfo").on("submit", function(e){
 	e.preventDefault();
 	var formData = new FormData(document.getElementById("saveInfo"));
-	$.ajax("{{ URL::to('usuarios/informacion?k='.$k) }}", {
+	$.ajax("{{ URL::to('usuarios/informacion?id='.$id) }}", {
 		type: 'post',
 		dataType: "html",
 		data: formData,
@@ -82,10 +65,10 @@
 			$(".btnsave").prop("disabled",true).html(btnSaveSpinner);
 		},success: function(res){
 			let row = JSON.parse(res);
-			if(row.success == 'ok'){
+			if(row.status == 'ok'){
 				$("#sximo-modal").modal("toggle");
-				user.rowsUser();
-				toastr.success(mss_tmp.success);
+				query();
+				toastr.success(row.message);
 			}else{
 				toastr.error(mss_tmp.error);
 			}
