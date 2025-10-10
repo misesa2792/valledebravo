@@ -7,18 +7,7 @@
         <input type="text" class="form-control no-borders" name="meta[]" placeholder="Meta" required>
     </td>
     <td>
-        <button type="button" class="btn btn-xs btn-default btn-outline btn-ses btnagregarum" id="{{ $time }}"> <i class="fa fa-plus"></i> </button>
-    </td>
-    <td>
-        <select name="um[]" id="sltum_{{$time}}" class="mySelectAc{{ $time }}" required>
-            <option value="">--Unidad de medida--</option>
-            @foreach($rowsUnidadMedida as $v)
-                <option value="{{$v->um}}">{{$v->um}}</option>
-            @endforeach
-        </select>
-         <script>
-            $(".mySelectAc{{ $time }}").select2();
-        </script>
+        <input type="text" name="um[]" class="form-control no-borders" placeholder="Unidad de medida" required>
     </td>
     <td>
         <input type="text" class="form-control no-borders text-center" name="anual[]" id="anual_{{ $time }}" placeholder="Prog. Anual" required readonly>

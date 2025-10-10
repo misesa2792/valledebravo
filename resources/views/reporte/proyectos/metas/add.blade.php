@@ -48,7 +48,6 @@
         <tr class="t-tr-s12 c-text-alt">
             <th width="40" class="text-center">Código</th>
             <th class="text-center" width="60%">Nombre de la meta de actividad</th>
-            <th width="40"></th>
             <th class="text-center" width="10%">Unidad Medida</th>
             <th class="text-center">Programación Anual </th>
             <th class="c-white bg-yellow-meta text-center">Primer Trimestre</th>

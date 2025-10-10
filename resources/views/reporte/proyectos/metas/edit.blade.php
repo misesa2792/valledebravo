@@ -39,7 +39,6 @@
         <tr class="t-tr-s12 c-text-alt">
             <th width="40" class="text-center">Código</th>
             <th width="30%" class="text-center" width="60%">Nombre de la meta de actividad</th>
-            <th width="40"></th>
             <th class="text-center" width="10%">Unidad Medida</th>
             <th class="text-center">Programación Anual </th>
             <th class="c-white bg-yellow-meta text-center">Primer Trimestre</th>
@@ -55,8 +54,6 @@
                 </td>
                 <td>
                     <input type="text" name="meta[]" value="{{ $v->meta }}" class="form-control no-borders" placeholder="Meta" required>
-                </td>
-                <td>
                 </td>
                 <td>
                     <input type="text" name="um[]" value="{{ $v->unidad_medida }}" class="form-control no-borders" placeholder="Unidad medida" required>
