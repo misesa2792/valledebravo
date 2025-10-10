@@ -20,8 +20,9 @@
                     <div class="sbox-title border-t-yellow">
                         <h4 class="col-md-8"> Usuarios</h4>
                         <div class="col-md-4 text-right">
-                            <a href="#" class="tips btn btn-xs b-r-30 btn-ses btn-success btnedit"><i
-                                    class="fa fa-plus-circle"></i>&nbsp;Agregar</a>
+                            @if(Auth::user()->id == 1)
+                                <a href="#" class="tips btn btn-xs b-r-30 btn-ses btn-success btnedit"><i class="fa fa-plus-circle"></i>&nbsp;Agregar</a>
+                            @endif
                         </div>
                     </div>
                     <div class="sbox-content bg-white" style="min-height:300px;">
