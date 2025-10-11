@@ -404,7 +404,16 @@ class AnteproyectoController extends Controller
 	{
 		return $this->poaservice->savepermisos($request);
 	}
-	
+	/*public function getEliminarmuestras(){
+		$rows = \DB::select("SELECT idreporte FROM ui_reporte where idinstituciones = 1");
+		foreach ($rows as $key => $v) {
+			foreach (\DB::select("SELECT idreporte_reg FROM ui_reporte_reg where idreporte = {$v->idreporte} ") as $k) {
+				\DB::table('ui_reporte_reg')->where('idreporte_reg', $k->idreporte_reg)->delete();
+			}
+			\DB::table('ui_reporte')->where('idreporte', $v->idreporte)->delete();
+		}
+		dd("ok");
+	}*/
 	
 	/*public function getAsignarprograma()
 	{

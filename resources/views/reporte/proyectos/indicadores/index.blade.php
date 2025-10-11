@@ -70,7 +70,12 @@
                   <template v-for="v in rowsData">
                   <tr>
                       <td width="30">
-                          
+                          <div class="btn-group" v-if="v.mirs.length == 0">
+                              <button type="button" class="btn btn-xs btn-white dropdown-toggle b-r-5" data-toggle="dropdown"><span class="fa fa-ellipsis-h c-text"></span></button>
+                              <ul class="dropdown-menu text-left overflow-h" role="menu" style="z-index: 9">
+                                    <li><a href="#" @click.prevent="destroyProyecto(v.id)"><i class="fa fa-trash-o c-danger cursor"></i> Eliminar proyecto</a></li>
+                              </ul>
+                            </div>
                       </td>
                       <td>@{{ v.no_dep_gen }} @{{ v.dep_gen }}</td>
                       <td>@{{ v.no_dep_aux }} @{{ v.dep_aux }}</td>
@@ -163,6 +168,30 @@
             },
             addProyecto(){
               modalMisesa("{{ URL::to('reporte/addindicador') }}",{idy: this.idy},"Agregar nuevo proyecto con meta","95%");
+            },
+            destroyProyecto(id){
+              swal({
+                    title : 'Eliminar proyecto',
+                    text: '¿Estás seguro de que deseas eliminar el proyecto? Esta acción es irreversible.',
+                    icon : 'warning',
+                    buttons : true,
+                    dangerMode : true
+                }).then((willDelete) => {
+                    if(willDelete){
+                        axios.delete('{{ URL::to("reporte/proyectofull") }}',{
+                            params : {id:id}
+                        }).then(response => {
+                            var row = response.data;
+                            if(row.status == "ok"){
+                                toastr.success(row.message);
+                                this.rowsProjects();
+                            }else{
+                                toastr.error(row.message);
+                            }
+
+                        })
+                    }
+                })
             },
             destroyPbrmd(id){
               swal({

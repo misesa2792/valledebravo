@@ -900,6 +900,17 @@ class ReporteController extends Controller {
 		}
 		return response()->json($response);
 	}
+	public function deleteProyectofull( Request $request){
+		try {
+			$this->model->getDestroyTable('ui_reporte','idreporte',$request->id);
+			$response = ["status" => "ok", "message" => "Proyecto eliminado correctamente!"];
+		} catch (\Exception $e) {
+			// Si hay un error, retornar mensaje de error
+			\SiteHelpers::auditTrail($request, "Error: " . $e->getMessage());
+			$response = ["status" => "error", "message" => "Error al eliminar el proyecto!"];
+		}
+		return response()->json($response);
+	}
 	public function getReversereconduccion( Request $r)
 	{
 		$decoder = SiteHelpers::CF_decode_json($r->k);
