@@ -77,13 +77,7 @@ class poa extends Model  {
 
 
 	
-	/*public static function getSearche($type,$idi,$idy){
-		return DB::select("SELECT e.idpd_pbrme as id,a.numero as no_dep_gen,a.descripcion as dep_gen,ac.numero as no_dep_aux,ac.descripcion as dep_aux,p.numero as no_proyecto,p.descripcion as proyecto,e.url FROM ui_pd_pbrme e
-			inner join ui_area_coordinacion ac on ac.idarea_coordinacion = e.idarea_coordinacion
-				inner join ui_area a on a.idarea = ac.idarea
-			inner join ui_proyecto p on p.idproyecto = e.idproyecto
-		where e.type = {$type} and e.idinstituciones = {$idi} and e.idanio = {$idy} and e.std_delete = 1 order by a.numero,ac.numero asc ");
-	}*/
+	
 	public static function getUsersActive($idi){
 		return DB::select("SELECT u.id,g.name as nivel,u.username,u.first_name,u.last_name FROM tb_users u
 		inner join tb_groups g on g.group_id = u.group_id
@@ -159,7 +153,16 @@ class poa extends Model  {
 			)
 			->get();
 	}
-
+	//Esta funcion es usada en la parte de agregar matrices en el modulo de indicadores
+    public static function getRowsMatricesIndicadores($id){
+        return DB::select("SELECT m.idprograma_reg,f.descripcion as frecuencia,t.descripcion as tipo_indicador,m.tipo,m.descripcion,SUBSTRING(ie.codigo,  9, 4) as mir,ie.indicador as nombre,m.formula,m.medios,m.supuestos FROM ui_programa_reg m
+			inner join ui_ind_estrategicos ie on ie.idind_estrategicos = m.idind_estrategicos
+            left join ui_frecuencia_medicion f on f.idfrecuencia_medicion = m.idfrecuencia_medicion
+			left join ui_tipo_indicador t on t.idtipo_indicador = m.idtipo_indicador
+        where m.idprograma = ?",[$id]);
+	}
+	
+	
 
 
 

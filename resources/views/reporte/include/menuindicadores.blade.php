@@ -57,6 +57,11 @@
                     <i class="fa icon-stats-up s-12"></i> Gráficas
                 </a>
             </li>
+            <li>
+                <a href="{{ URL::to('indicadores/indicadoresproyecto?idy='.$idy) }}" class="btn b-r-30 {{ $active == 9 ? 'bg-blue c-white' : ' border-black bg-white c-text' }} tips" title="Indicadores">
+                    <i class="fa icon-notebook"></i> Indicadores
+                </a>
+            </li>
         @endif
     </ul>
 </section>

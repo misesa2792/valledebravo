@@ -158,6 +158,32 @@ class reporte extends Sximo  {
 				inner join ui_area a on a.idarea = ac.idarea
 			where r.type = 1 and r.idanio = 2 order by a.numero,ac.numero asc");
 	}
+	public static function getVerificarIDReporte($idi, $idy, $idac, $idp, $type){
+       return DB::table('ui_reporte')
+			->where('idinstituciones', $idi)
+			->where('idanio', $idy)
+			->where('id_area_coordinacion', $idac)
+			->where('idproyecto', $idp)
+			->where('type', $type)
+			->select('idreporte')
+			->first();
+	}
+	public static function getIDprogramaProyecto($id){
+       return DB::table('ui_proyecto as p')
+		->join('ui_subprograma as sp', 'sp.idsubprograma', '=', 'p.idsubprograma')
+		->join('ui_programa as pr', 'pr.idprograma', '=', 'sp.idprograma')
+		->where('p.idproyecto', $id)
+		->select('pr.idprograma', 'pr.numero', 'pr.descripcion')
+		->first();
+	}
+	public static function getMatrices($id){
+		return DB::select("SELECT idreporte_mir as id,ie.codigo as mir,ie.indicador,mf.formula,f.descripcion as frecuencia,rm.iddimension_atiende,rm.aplica1,rm.aplica2,rm.aplica3,rm.aplica4 FROM ui_reporte_mir rm 
+		inner join ui_programa_reg pr on pr.idprograma_reg = rm.idprograma_reg
+			inner join ui_ind_estrategicos ie on  ie.idind_estrategicos = pr.idind_estrategicos
+			left join ui_mir_formula mf on mf.idmir_formula = pr.idmir_formula
+			left join ui_frecuencia_medicion f on f.idfrecuencia_medicion = pr.idfrecuencia_medicion
+		where rm.idreporte = ?",[$id]);
+	}
 
 
 
@@ -549,6 +575,26 @@ class reporte extends Sximo  {
 		where m.idreporte = {$id}");
 	}
 	public static function getMirInformacion($id){
+		return \DB::select("SELECT ie.codigo as mir,ie.indicador,
+		m.aplica1,m.aplica2,m.aplica3,m.aplica4,
+        mf.idmir_formula,preg.formula as form_larga,mf.formula,m.interpretacion,m.desc_factor,f.descripcion as frecuencia,ti.descripcion as tipo_indicador,m.iddimension_atiende,m.factor,
+		m.linea,m.descripcion_meta,preg.medios,m.metas_actividad,
+        p.numero as no_proyecto,p.descripcion as proyecto,pr.numero as no_programa,pr.descripcion as programa,pr.objetivo as obj_programa,pr.tema_desarrollo,pi.numero as no_pilar,pi.pilares as pilar,
+        a.numero as no_dep_gen,a.descripcion as dep_gen,ac.numero as no_dep_aux,ac.descripcion as dep_aux,m.ambito,m.cobertura FROM ui_reporte_mir m 
+        inner join ui_programa_reg preg on preg.idprograma_reg = m.idprograma_reg
+			inner join ui_ind_estrategicos ie on  ie.idind_estrategicos = preg.idind_estrategicos
+			left join ui_mir_formula mf on mf.idmir_formula = preg.idmir_formula
+			left join ui_frecuencia_medicion f on f.idfrecuencia_medicion = preg.idfrecuencia_medicion
+            left join ui_tipo_indicador ti on ti.idtipo_indicador = preg.idtipo_indicador
+        inner join ui_reporte r on r.idreporte = m.idreporte
+			inner join ui_proyecto p on p.idproyecto = r.idproyecto
+				inner join ui_subprograma sp on sp.idsubprograma = p.idsubprograma
+					inner join ui_programa pr on pr.idprograma = sp.idprograma
+						left join ui_pdm_pilares pi on pi.idpdm_pilares = pr.idpdm_pilares
+			inner join ui_area_coordinacion ac on ac.idarea_coordinacion = r.id_area_coordinacion
+				inner join ui_area a on a.idarea = ac.idarea
+			where m.idreporte_mir = ?",[$id]);
+		//old
 		return \DB::select("SELECT m.mir,m.idind_estrategicos,m.nombre_indicador,m.aplica1,m.aplica2,m.aplica3,m.aplica4,m.idmir_formula,m.formula,m.interpretacion,m.desc_factor,m.idfrecuencia_medicion,m.iddimension_atiende,m.factor,m.idtipo_indicador,
 		m.linea,m.descripcion_meta,m.medios_verificacion,m.metas_actividad,
         p.numero as no_proyecto,p.descripcion as proyecto,pr.numero as no_programa,pr.descripcion as programa,pr.objetivo as obj_programa,pr.tema_desarrollo,pi.numero as no_pilar,pi.pilares as pilar,
@@ -912,6 +958,12 @@ class reporte extends Sximo  {
 	public static function getDeleteMetasDelProyecto($id){
 		return DB::table('ui_reporte_reg')
 		->where('idreporte', $id)
+		->delete();
+	}
+	//Eliminar indicadores con el mismo ID
+	public static function getDeleteIndicadorDelProyecto($id){
+		return DB::table('ui_reporte_reg')
+		->where('idreporte_mir', $id)
 		->delete();
 	}
 }

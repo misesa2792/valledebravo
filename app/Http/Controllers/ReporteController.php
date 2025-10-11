@@ -5,7 +5,7 @@ use App\Http\Controllers\controller;
 use App\Models\Reporte;
 use App\Models\Exportar;
 use App\Models\Access\Years;
-
+use App\Models\Poa\Pbrmd;
 use App\Services\MetasService;
 use App\Services\GeneralService;
 
@@ -726,6 +726,12 @@ class ReporteController extends Controller {
 	public function getAddmeta(Request $request){
 		return $this->metasService->addMeta($request);
 	}
+	public function getAddindicador(Request $request){
+		return $this->metasService->addIndicador($request);
+	}
+	public function getLoadmatriz(Request $request){
+		return $this->metasService->loadMatriz($request);
+	}
 	public function getEditmeta(Request $request){
 		return $this->metasService->editMeta($request);
 	}
@@ -771,6 +777,50 @@ class ReporteController extends Controller {
 		}
 		return response()->json($response);
 	}
+	public function postAddmatriz(Request $request){
+		if(count($request->ids) == 0){
+			$response = ["status" => "error", "message" => "Selecciona indicadores de la matriz!"];
+			return response()->json($response);
+		}
+
+		$idi = Auth::user()->idinstituciones;
+		$type = 1;
+		$dataProy = ['idinstituciones' 	=> $idi,
+				'idanio' 				=> $request->idy,
+				'id_area_coordinacion' 	=> $request->idac,
+				'idproyecto' 			=> $request->idp,
+				'type' 					=> $type //Indicador
+			];
+		//Validar que no exita el proyecto
+		$row = $this->model->getVerificarIDReporte($idi, $request->idy, $request->idac, $request->idp, $type);
+		if($row){
+			$id = $row->idreporte;
+		}else{
+			$id = $this->model->getInsertTable($dataProy, 'ui_reporte');
+		}
+		//Inserto la matriz
+		foreach ($request->ids as $idprograma_reg) {
+			$dataMatriz = [
+				"idreporte"              => $id,
+				"idprograma_reg"          => $idprograma_reg,
+			];
+			$idrm = $this->model->getInsertTable($dataMatriz, 'ui_reporte_mir');
+			$this->insertIndicador($id,$idrm, $idprograma_reg);
+		}
+		$response = ["status" => "ok", "message" => "Proyecto agregado correctamente!"];
+		return response()->json($response);
+	}
+	private function insertIndicador($id, $idrm, $idprograma_reg){
+        foreach (Pbrmd::getRowsIndicadores($idprograma_reg) as $row) {
+            $data = ['idreporte' 				=> $id,
+					 'idreporte_mir' 			=> $idrm,
+                     'idind_estrategicos_reg'  	=> $row->id,
+                     'descripcion'  			=> $row->nombre_largo
+                    ]; 
+			$this->model->getInsertTable($data, 'ui_reporte_reg');
+        }
+        return true;
+    }
 	public function postMovemeta(Request $request){
 		try {
 			$data = ['id_area_coordinacion' => $request->idac];
@@ -835,6 +885,18 @@ class ReporteController extends Controller {
 			// Si hay un error, retornar mensaje de error
 			\SiteHelpers::auditTrail($request, "Error: " . $e->getMessage());
 			$response = ["status" => "error", "message" => "Error al eliminar la meta!"];
+		}
+		return response()->json($response);
+	}
+	public function deleteIndicadorfull( Request $request){
+		try {
+			$this->model->getDestroyTable('ui_reporte_mir','idreporte_mir',$request->id);
+			$this->model->getDeleteIndicadorDelProyecto($request->id);
+			$response = ["status" => "ok", "message" => "Indicador eliminado correctamente!"];
+		} catch (\Exception $e) {
+			// Si hay un error, retornar mensaje de error
+			\SiteHelpers::auditTrail($request, "Error: " . $e->getMessage());
+			$response = ["status" => "error", "message" => "Error al eliminar el indicador!"];
 		}
 		return response()->json($response);
 	}
@@ -1450,6 +1512,10 @@ class ReporteController extends Controller {
 	}
 	public function getMetasproyectosall(Request $request){
 		$data = $this->metasService->getRowsMetasProyectos($request);
+		return response()->json($data);
+	}
+	public function getIndicadorproyectosall(Request $request){
+		$data = $this->metasService->getRowsIndicadoresProyectos($request);
 		return response()->json($data);
 	}
 	private function getSelectMesActual($year){

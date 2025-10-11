@@ -89,12 +89,6 @@ class Pbrme extends Model {
             left join ui_frecuencia_medicion f on f.idfrecuencia_medicion = m.idfrecuencia_medicion
 			left join ui_tipo_indicador t on t.idtipo_indicador = m.idtipo_indicador
         where r.idpd_pbrme = ?",[$id]);
-
-		/*return DB::select("SELECT m.*,f.descripcion as frecuencia,t.descripcion as tipo_indicador FROM ui_pd_pbrme_matriz m
-            inner join ui_pd_pbrme e on e.idpd_pbrme = m.idpd_pbrme
-            left join ui_frecuencia_medicion f on f.idfrecuencia_medicion = m.idfrecuencia_medicion
-            left join ui_tipo_indicador t on t.idtipo_indicador = m.idtipo_indicador
-        where m.idpd_pbrme = ? and e.no_matriz = ?",[$id, $no]);*/
 	}
    /* public static function getIndicadoresReg($id){
 		return DB::select("SELECT nombre_corto,nombre_largo FROM ui_ind_estrategicos_reg where idind_estrategicos = ?",[$id]);

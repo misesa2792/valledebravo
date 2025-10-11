@@ -1612,6 +1612,23 @@ class MetasService extends Controller
 		}
         return ['status' => 'ok', 'data' => array_values($data)];
     }
+    public function getRowsIndicadoresProyectos(Request $request){
+        $data = [];
+        $idi = Auth::user()->idinstituciones;
+		foreach (Reporte::getMetasProyectos($request->all(), $idi) as $v) {
+			$data[] = [
+				'id' => $v->id,
+				'no_dep_gen' => $v->no_dep_gen,
+				'dep_gen' => $v->dep_gen,
+				'no_dep_aux' => $v->no_dep_aux,
+				'dep_aux' => $v->dep_aux,
+				'no_proyecto' => $v->no_proyecto,
+				'proyecto' => $v->proyecto,
+				'mirs' => Reporte::getMatrices($v->id)
+			];
+		}
+        return ['status' => 'ok', 'data' => array_values($data)];
+    }
     public function getRowsProjectsOchocTxt($idy,$var_trim){
         $data = array();
 		foreach (Reporte::getProjectsOchoCTxt($idy, \Auth::user()->idinstituciones) as $v) {
@@ -1714,8 +1731,8 @@ class MetasService extends Controller
         }
         return $data;
     }
-    public function getRowsEditIndicador($decoder){
-        $data = Reporte::getMirInformacion($decoder['id']);
+    public function getRowsEditIndicador($id){
+        $data = Reporte::getMirInformacion($id);
         return $data[0];
     }
     public function addMeta(Request $request){
@@ -1725,10 +1742,44 @@ class MetasService extends Controller
 		$this->data['rowsProyectos'] = Sximo::getProjectsActive($request->idy);
 		return view("reporte.proyectos.metas.add",$this->data);
     }
+    public function addIndicador(Request $request){
+        $idi = Auth::user()->idinstituciones;
+		$this->data['idy'] = $request->idy;
+		$this->data['rowsDepGen'] = Sximo::getCatDepGeneralNew($idi, $request->idy);
+		$this->data['rowsProyectos'] = Sximo::getProjectsActive($request->idy);
+		return view("reporte.proyectos.indicadores.add",$this->data);
+    }
     public function trMeta(Request $request){
         $this->data['time'] = rand(3,100).time();
         $this->data['rowsUnidadMedida'] = Poa::getUnidadMedidas();
 		return view("reporte.proyectos.metas.tr",$this->data);
+    }
+    public function loadMatriz(Request $request){
+        $fin = [];
+        $proposito = [];
+        $componente = [];
+        $actividad = [];
+        $info = Reporte::getIDprogramaProyecto($request->idp);
+        if($info){
+            foreach (Poa::getRowsMatricesIndicadores($info->idprograma) as $row) {
+                //validamos que este asignado a un proyecto
+                if($row->tipo == 1){
+                    $fin = ['row' => $row];
+                } elseif($row->tipo == 2){
+                    $proposito = ['row' => $row];
+                } elseif($row->tipo == 3){
+                    $componente[] = ['row' => $row];
+                } elseif($row->tipo == 4){
+                    $actividad[] = ['row' => $row];
+                } 
+            }
+            $this->data['row'] = $info;
+            $this->data['fin'] = $fin;
+            $this->data['proposito'] = $proposito;
+            $this->data['componente'] = $componente;
+            $this->data['actividad'] = $actividad;
+		    return view("reporte.proyectos.indicadores.matriz",$this->data);
+        }
     }
     public function editMeta(Request $request){
 		$this->data['row'] = Reporte::getMetaInformacion($request->id);

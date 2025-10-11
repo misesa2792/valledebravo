@@ -402,6 +402,18 @@ class IndicadoresController extends Controller {
 		$this->data['activeName'] 	= 'Calendarización de indicadores';
 		return view('reporte.proyectos.calendarizar.index',$this->data);	
 	}
+	public function getIndicadoresproyecto( Request $r){
+		$modulo = Years::getModuleAccessByYearsID(self::MODULE, Auth::user()->idinstituciones, $r->idy);
+		if(count($modulo) == 0){
+			return Redirect::to('dashboard')->with('messagetext', 'No se encontro información!')->with('msgstatus','error');
+		}
+		$this->data['type'] 		= 1;// 0 - Metas y 1 Indicadores 
+		$this->data['year'] 		= $modulo[0]->anio;
+		$this->data['idy']  		= $r->idy;
+		$this->data['active'] 		= 9;
+		$this->data['activeName'] 	= 'Indicadores proyectos';
+		return view('reporte.proyectos.indicadores.index',$this->data);	
+	}
 	public function getGraficas( Request $r){
 		$idy = $r->idy;
 		$idi = Auth::user()->idinstituciones;
@@ -905,20 +917,14 @@ class IndicadoresController extends Controller {
 		$data = $this->metasService->getRowsProjectsOchob($r->idy, $r->type,$r->year,$r->ida);
 		return response()->json($data);
 	}	
-	public function getEditindicador(Request $r){
-		$decoder = SiteHelpers::CF_decode_json($r->k);
-		$this->data['json'] = $this->metasService->getRowsEditIndicador($decoder);
-		$this->data['catIndEst'] = $this->reporte->getCatIndestrategicos(3);
-		$this->data['rowsMetas'] = $this->reporte->getMirMetas($decoder['id']);
+	public function getEditindicador(Request $request){
+		$this->data['json'] = $this->metasService->getRowsEditIndicador($request->id);
+		$this->data['rowsMetas'] = $this->reporte->getMirMetas($request->id);
 		$this->data['rowsAplica'] = ['1' => 'Aplica', '2' => 'No Aplica'];
-		$this->data['rowsFormulas'] = $this->reporte->getMirFormulas();
-		$this->data['rowsFrec'] = $this->model->getCatFrecuenciaMedicion();
 		$this->data['rowsDim'] = $this->model->getCatDimensionAtiende();
-		$this->data['rowsTipo'] = $this->model->getCatTipoIndicador();
 		$this->data['rowsOperacion'] = $this->model->getCatTipoOperacion();
-		$this->data['token'] = $r->k;
-		$this->data['id'] = $decoder['id'];
-		return view($this->module.".proyectos.ochob.edit",$this->data);
+		$this->data['id'] = $request->id;
+		return view("reporte.proyectos.indicadores.edit",$this->data);
 	}	
 	public function getAddindicador(Request $r){
 		$decoder = SiteHelpers::CF_decode_json($r->k);
@@ -945,28 +951,15 @@ class IndicadoresController extends Controller {
 		return response()->json($response);
 	}
 	public function postEditindicador(Request $r){
-		$decoder = SiteHelpers::CF_decode_json($r->k);
-		if (!$decoder) {
-			return response()->json(["status" => "error", "message" => "Error de key!"]);
-		}
-
 		try {
 			// Iniciar la transacción
-			DB::transaction(function () use ($r, $decoder) {
-				$data = ['mir'				=> $r->mir, 
-					'idind_estrategicos'  	=> $r->idind_estrategicos,
-					'nombre_indicador'  	=> $r->nombre_indicador,
-					'formula' 				=> $r->formula,
-					'idmir_formula' 		=> $r->idmir_formula,
+				$data = [
 					'interpretacion' 		=> $r->interpretacion,
-					'idfrecuencia_medicion' => $r->idfrecuencia_medicion,
 					'iddimension_atiende' 	=> $r->iddimension_atiende,
 					'factor' 				=> $r->factor,
-					'idtipo_indicador' 		=> $r->idtipo_indicador,
 					'desc_factor' 			=> $r->desc_factor,
 					'linea' 				=> $r->linea,
 					'descripcion_meta' 		=> $r->descripcion_meta,
-					'medios_verificacion' 	=> $r->medios_verificacion,
 					'metas_actividad' 		=> $r->metas_actividad,
 					'ambito' 				=> $r->ambito,
 					'cobertura' 			=> $r->cobertura,
@@ -975,11 +968,10 @@ class IndicadoresController extends Controller {
 					'aplica3'  				=> $r->aplica3,
 					'aplica4'  				=> $r->aplica4,
 				];
-				$this->model->getUpdateTable($data, 'ui_reporte_mir', 'idreporte_mir', $decoder['id']);
+				$this->model->getUpdateTable($data, 'ui_reporte_mir', 'idreporte_mir', $r->id);
 				//Actualizo registros
 				for ($i=0; $i < count($r->idrg); $i++) { 
-					$arr = ['descripcion' 		=> $r->meta[$i],
-							'idind_estrategicos_reg' 	=> $r->idind_estrategicos_reg[$i],
+					$arr = [
 							'unidad_medida' 	=> $r->unidad_medida[$i],
 							'idtipo_operacion' 	=> $r->idtipo_operacion[$i],
 							'prog_anual' 		=> $r->prog_anual[$i],
@@ -990,7 +982,6 @@ class IndicadoresController extends Controller {
 						];
 					$this->model->getUpdateTable($arr, 'ui_reporte_reg', 'idreporte_reg', $r->idrg[$i]);
 				}
-			});
 			// Si todo sale bien, retornar éxito
 			$response = ["status" => "ok", "message" => "Indicador guardado correctamente!"];
 		} catch (\Exception $e) {
