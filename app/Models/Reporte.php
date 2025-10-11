@@ -158,6 +158,14 @@ class reporte extends Sximo  {
 				inner join ui_area a on a.idarea = ac.idarea
 			where r.type = 1 and r.idanio = 2 order by a.numero,ac.numero asc");
 	}
+	public static function getMirEstatus($idrm){
+		return \DB::table('ui_reporte_mir as rm')
+				->join('ui_programa_reg as pr', 'pr.idprograma_reg', '=', 'rm.idprograma_reg')
+				->join('ui_ind_estrategicos as ie', 'ie.idind_estrategicos', '=', 'pr.idind_estrategicos')
+				->select('ie.codigo as mir','ie.indicador', 'aplica1', 'aplica2', 'aplica3', 'aplica4')
+				->where('rm.idreporte_mir', $idrm)
+				->first();
+	}
 	public static function getVerificarIDReporte($idi, $idy, $idac, $idp, $type){
        return DB::table('ui_reporte')
 			->where('idinstituciones', $idi)

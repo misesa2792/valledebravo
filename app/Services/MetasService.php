@@ -1533,6 +1533,7 @@ class MetasService extends Controller
 
                 if(!isset($json[$v->idreporte_mir])){
                     $json[$v->idreporte_mir] = ["j"         => ++$j,
+                                                "idrm"      => $v->idreporte_mir,
                                                 "no_a"      => $v->codigo,
                                                 "meta"      => $v->indicador, 
                                                 "a1"    =>$v->aplica1,
@@ -1548,6 +1549,7 @@ class MetasService extends Controller
         $data = [];
         foreach ($json as $v) {
             $data[] = ['j'=>$v['j'], 
+                        'idrm' => $v['idrm'], 
                         'no_a' => $v['no_a'], 
                         'meta' => $v['meta'], 
                         'total' => count($v['rowsInd']), 

@@ -131,7 +131,19 @@
                                 <td class="no-borders"></td>
                             </tr>
                             <tr class="t-tr-s10">
-                                <td class="text-center bg-white no-borders s-12" :rowspan="(row.total * 2) + 1">@{{ row.no_a }}</td>
+                                <td class="text-center bg-white no-borders s-12" :rowspan="(row.total * 2) + 1">@{{ row.no_a }}
+
+                                    @if(Auth::user()->group_id == 1 || Auth::user()->group_id == 2)
+                                        <div class="m-t-md">
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-xs btn-white dropdown-toggle b-r-5 s-12" data-toggle="dropdown"><span class="fa fa-ellipsis-h c-text-alt">  </span></button>
+                                                <ul class="dropdown-menu text-left overflow-h s-14 c-text-alt" role="menu">
+                                                    <li><a href="#" class="tips" @click.prevent="cambiarEstatus(row.idrm)" ><i class="fa fa-random c-primary-alt"></i> Cambiar estatus</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </td>
                                 <td class="bg-white c-text s-12 no-borders" :rowspan="(row.total * 2) + 1">
                                     <div class="font-bold">@{{ row.meta }}</div>
                                 </td>
@@ -313,6 +325,9 @@
             },
             regObs(idrg,obs,trim){
                 modalMisesa("{{ URL::to('reporte/registrarobs') }}",{idrg:idrg,obs:obs,trim:trim},"Agregar Justificación","40%");
+            },
+            cambiarEstatus(idrm){
+                modalMisesa("{{ URL::to('reporte/cambiarestatus') }}",{idrm:idrm},"Cambiar Estatus del Indicador","40%");
             }
         },
         mounted(){

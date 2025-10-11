@@ -1462,7 +1462,21 @@ class ReporteController extends Controller {
 	private function getUpgradePbrmOcho($id, $trim, $number){
 		$this->model->getUpdateTable(['foda'.$trim => $number], "ui_reporte", "idreporte", $id);
 	}
-
+	public function getCambiarestatus( Request $request){
+		$this->data['idrm'] = $request->idrm;
+		$this->data['row'] = $this->model->getMirEstatus($request->idrm);
+		$this->data['rowEstatus'] = ['1'=>'Aplica', '2'=>'No aplica'];
+		return view('indicadores.proyectos.estatus',$this->data);	
+	}
+	public function postSavestatus( Request $request){
+		$data = ['aplica1' => $request->aplica1, 
+				"aplica2" => $request->aplica2, 
+				"aplica3" => $request->aplica3, 
+				"aplica4" => $request->aplica4];
+		$this->model->getUpdateTable($data, "ui_reporte_mir", "idreporte_mir", $request->idrm);
+		$response = ["status"=>"ok", "message"=>"Información guardada correctamente"];
+		return response()->json($response);
+	}
 	public function getPermisos( Request $r){
 		$modulo = Years::getModuleAccessByYearsID(self::MODULE,Auth::user()->idinstituciones,$r->idy);
 		if(count($modulo) == 0){
