@@ -7,7 +7,7 @@
 <title> {{ CNF_APPNAME }} </title>
 <meta name="keywords" content="">
 <meta name="description" content=""/>
-<link rel="shortcut icon" href="{{ asset('ses.ico')}}" type="image/x-icon">
+<link rel="shortcut icon" href="{{ asset('favicon.ico')}}" type="image/x-icon">
 
 		<link href="{{ asset('mass/js/plugins/bootstrap/css/bootstrap.css?v1.3')}}" rel="stylesheet">
 		<link href="{{ asset('mass/js/plugins/datepicker/css/bootstrap-datetimepicker.min.css')}}" rel="stylesheet">
