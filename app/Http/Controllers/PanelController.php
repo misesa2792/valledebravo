@@ -6,6 +6,7 @@ use App\Models\Panel;
 use App\Models\Access\Years;
 use App\Models\Anios;
 use App\Models\Area;
+use App\Models\Sximo;
 use App\Models\Instituciones;
 
 use Illuminate\Http\Request;
@@ -172,6 +173,29 @@ class PanelController extends Controller {
 			return view('panel.dependencias.view',$this->data);
 		}
 		return view('panel.dependencias.index',$this->data);
+	}
+	public function getConfiguracion( Request $request )
+	{
+		if(Auth::user()->group_id != 1 && Auth::user()->group_id != 2){
+			return Redirect::to('dashboard')->with('messagetext', Lang::get('core.note_restric'))->with('msgstatus','error');
+		}
+		//$this->data['rowsAnios'] = Years::getModuleAccessByYears(self::MODULE, Auth::user()->idinstituciones);
+		$this->data['rowsAnios'] = \DB::select("SELECT idanio, anio FROM ui_anio WHERE idanio in (4,5)");
+		if(isset($request->idy)){
+			$this->data['row'] = Anios::find($request->idy,['idanio as idy','anio as year']);
+			$this->data['pages'] = $this->getNoPaginacion(); 
+			$this->data['rows'] = $this->model->getConfiguracion(Auth::user()->idinstituciones, $request->idy); 
+			return view('panel.configuracion.view',$this->data);
+		}
+		return view('panel.configuracion.index',$this->data);
+	}
+	public function postSaveconfig( Request $request )
+	{
+		$data = ['t_uippe' => $request->t_uippe, 'c_uippe' => $request->c_uippe,
+				't_tesoreria' => $request->t_tesoreria, 'c_tesoreria' => $request->c_tesoreria, 
+		];
+		Sximo::getUpdateTable($data, 'ui_instituciones_info', 'idinstituciones_info', $request->id);
+		return Redirect::to('panel/configuracion?idy='.$request->idy)->with('messagetext', 'Información guardada correctamente!')->with('msgstatus','success');
 	}
 	public function getEnlaces( Request $request )
 	{

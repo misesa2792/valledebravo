@@ -11,5 +11,19 @@ class panel extends Model  {
 	public static function getDepGen($idi, $idy){
 		return DB::select("SELECT a.idarea as id,a.numero as no_dep_gen,a.descripcion as dep_gen,a.titular,a.cargo FROM ui_area a where a.idinstituciones = {$idi} and a.idanio = {$idy} and a.estatus = 1 order by a.numero asc ");
 	}
-
+	public static function getConfiguracion($idi, $idy){
+		return DB::table('ui_instituciones_info')
+				->select(
+					'idinstituciones_info as id',
+					'logo_izq',
+					'logo_der',
+					't_uippe',
+					'c_uippe',
+					't_tesoreria',
+					'c_tesoreria'
+				)
+				->where('idinstituciones', $idi)
+				->where('idanio', $idy)
+				->first();
+	}
 }

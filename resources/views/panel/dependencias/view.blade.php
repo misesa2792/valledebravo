@@ -7,7 +7,7 @@
 
 	<section class="page-header bg-body">
 		<div class="page-title">
-			<h3 class="c-blue"> {{ $pageTitle }} <small class="s-12"><i>Titulares por dependencia general</i></small></h3>
+			<h3 class="c-blue"> {{ $pageTitle }} <small class="s-12"><i>Organigrama de dependencias</i></small></h3>
 		</div>
 	
 		<ul class="breadcrumb bg-body">
@@ -22,7 +22,7 @@
 	  <article class="col-md-12 m-t-md">
       <div class="page-content-wrapper no-padding">
         <div class="sbox animated fadeInRight ">
-            <div class="sbox-title border-t-green"> <h4> Dependencias Generales</h4></div>
+            <div class="sbox-title border-t-green"> <h4> Organigrama de dependencias</h4></div>
             <div class="sbox-content bg-white" style="min-height:300px;"> 	
 
 

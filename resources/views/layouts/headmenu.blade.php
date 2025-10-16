@@ -54,6 +54,13 @@
 								</a>
 							</div>
 							
+							<div class="col-xs-4 col-sm-3 grid-item">
+								<a href="{{ URL::to('panel/configuracion') }}">
+									<span class="circle bg-ses-blue c-white"><span class="fa fa-wrench"></span></span>
+									<span class="grid-label c-text-alt">Configuración</span>
+								</a>
+							</div>
+
 						</div>
 					</div>
 				</div>
