@@ -159,6 +159,20 @@ class PanelController extends Controller {
 		}
 		return view('panel.titulares.index',$this->data);
 	}
+	public function getDependencias( Request $request )
+	{
+		if(Auth::user()->group_id != 1 && Auth::user()->group_id != 2){
+			return Redirect::to('dashboard')->with('messagetext', Lang::get('core.note_restric'))->with('msgstatus','error');
+		}
+		//$this->data['rowsAnios'] = Years::getModuleAccessByYears(self::MODULE, Auth::user()->idinstituciones);
+		$this->data['rowsAnios'] = \DB::select("SELECT idanio, anio FROM ui_anio WHERE idanio in (4,5)");
+		if(isset($request->idy)){
+			$this->data['row'] = Anios::find($request->idy,['idanio as idy','anio as year']);
+			$this->data['pages']	= $this->getNoPaginacion(); 
+			return view('panel.dependencias.view',$this->data);
+		}
+		return view('panel.dependencias.index',$this->data);
+	}
 	public function getEnlaces( Request $request )
 	{
 		if(Auth::user()->group_id != 1 && Auth::user()->group_id != 2){

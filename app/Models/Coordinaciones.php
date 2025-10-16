@@ -50,6 +50,40 @@ class coordinaciones extends Sximo  {
 		
 		return $query->paginate($perPage);
 	}
+    public static function getSearchDep($request, $idi){
+		 $idy = (int) $request['idy'];
+		$perPage = (int) $request['nopagina'];
+        $query = DB::table('ui_area as a')
+            ->leftjoin('ui_dep_gen as dg', 'dg.iddep_gen', '=', 'a.iddep_gen')
+            ->join('ui_instituciones as i', 'i.idinstituciones', '=', 'a.idinstituciones')
+            	->join('ui_municipios as m', 'm.idmunicipios', '=', 'i.idmunicipios')
+            	->join('ui_tipo_dependencias as tp', 'tp.idtipo_dependencias', '=', 'i.idtipo_dependencias')
+            ->select([
+                'a.idarea as id',
+                'm.descripcion as municipio',
+                'tp.idtipo_dependencias as idtd',
+                'tp.abreviatura',
+                'i.denominacion as no_institucion',
+                'i.descripcion as institucion',
+                'a.estatus',
+                'a.numero as no_dep_gen',
+                'a.descripcion as dep_gen'
+            ])
+            ->where('a.estatus', 1)
+            ->where('a.idinstituciones', $idi)
+            ->where('a.idanio', $idy);
+
+		if (!empty($request['no']) && trim($request['no']) !== '') {
+			$query->where('a.numero', 'like', '%'.trim($request['no']).'%');
+		}
+		if (!empty($request['dg']) && trim($request['dg']) !== '') {
+			$query->where('a.descripcion', 'like', '%'.trim($request['dg']).'%');
+		}
+		$query->orderBy('i.denominacion')->orderBy('a.numero');
+        // Paginar (LengthAwarePaginator con total)
+		
+		return $query->paginate($perPage);
+	}
 	public static function getDepAuxRel($ida){
         return DB::table('ui_area_coordinacion as ac')
             ->leftjoin('ui_dep_aux as da', 'da.iddep_aux', '=', 'ac.iddep_aux')

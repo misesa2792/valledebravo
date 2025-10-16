@@ -81,6 +81,39 @@ class CoordinacionesController extends Controller {
 		$this->data['idy'] = $request->idy;
 		return view($this->module.'.search',$this->data);
 	}
+	public function postSearchdep( Request $request )
+	{
+/*
+		foreach (\DB::select("SELECT * FROM ui_area where idinstituciones = 1") as $a) {
+			foreach (\DB::select("SELECT * FROM ui_area_coordinacion where idarea = ".$a->idarea) as $key => $d) {
+				$this->model->getDestroyTable("ui_area_coordinacion","idarea_coordinacion", $d->idarea_coordinacion);
+			}
+				$this->model->getDestroyTable("ui_area","idarea", $a->idarea);
+		}
+*/
+		$idi = \Auth::user()->idinstituciones;
+		$rows = $this->model->getSearchDep($request->all(), $idi);
+		// Agrega/transforma campos en cada item de la página actual
+		$rows->getCollection()->transform(function ($row) {
+			$data = ['id' 	=> $row->id,
+					'idtd' 	=> $row->idtd,
+					'std' 	=> $row->estatus,
+					'mun' 	=> $row->municipio,
+					'abr' 	=> $row->abreviatura,
+					'noi' 	=> $row->no_institucion,
+					'ins' 	=> $row->institucion,
+					'ndg' 	=> $row->no_dep_gen,
+					'dg' 	=> $row->dep_gen,
+					'rows'  => $this->model->getDepAuxRel($row->id)
+					];
+			return $data;
+		});
+		$this->data['j'] = ($request->page * $request->nopagina)- $request->nopagina;
+		$this->data['pagination'] = $rows;
+		$this->data['access'] = $this->access;
+		$this->data['idy'] = $request->idy;
+		return view('panel.dependencias.search',$this->data);
+	}
 
 	function getUpdate(Request $request)
 	{
