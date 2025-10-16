@@ -871,6 +871,26 @@ abstract class Controller extends BaseController {
 			SELECT sub1.*,(sub1.cant_1 + sub1.cant_2 + sub1.cant_3 + sub1.cant_4) as total_realizado,
 			sub1.cant_1  as avance_1,(sub1.cant_1 + sub1.cant_2) as avance_2,((sub1.cant_1 + sub1.cant_2) + sub1.cant_3) as avance_3,(((sub1.cant_1 + sub1.cant_2) + sub1.cant_3) + sub1.cant_4) as avance_4
 			,(sub1.prog_anual + sub1.resta_1) as mod_1, ((sub1.prog_anual + sub1.resta_1) + sub1.resta_2) as mod_2, (((sub1.prog_anual + sub1.resta_1) + sub1.resta_2) + sub1.resta_3) as mod_3, ((((sub1.prog_anual + sub1.resta_1) + sub1.resta_2) + sub1.resta_3) + sub1.resta_4) as mod_4 FROM(
+				SELECT qry.idreporte_reg,qry.no_accion,qry.tipo_operacion,qry.descripcion,qry.unidad_medida,qry.obs1,qry.obs2,qry.obs3,qry.obs4,
+					qry.prog_anual,qry.trim_1,qry.trim_2,qry.trim_3,qry.trim_4,qry.cant_1,qry.cant_2,qry.cant_3,qry.cant_4,qry.por_1,qry.por_2,qry.por_3,qry.por_4,
+					(qry.cant_1 - qry.trim_1) as resta_1,(qry.cant_2 - qry.trim_2) as resta_2,(qry.cant_3 - qry.trim_3) as resta_3,(qry.cant_4 - qry.trim_4) as resta_4
+					FROM (
+						SELECT info.*,
+							IFNULL(((info.cant_1 * 100)/info.trim_1),0) as por_1,IFNULL(((info.cant_2 * 100)/info.trim_2),0) as por_2,IFNULL(((info.cant_3 * 100)/info.trim_3),0) as por_3,IFNULL(((info.cant_4 * 100)/info.trim_4),0) as por_4 FROM 
+							(SELECT r.idreporte_reg,tp.descripcion as tipo_operacion,r.descripcion,r.unidad_medida,r.prog_anual,r.trim_1,r.trim_2,r.trim_3,r.trim_4,IFNULL(m1.cant_1,0) cant_1,IFNULL(m2.cant_2,0) cant_2,IFNULL(m3.cant_3,0) cant_3,IFNULL(m4.cant_4,0) cant_4,r.observaciones as obs1,r.obs2,r.obs3,r.obs4,r.no_accion FROM ui_reporte re
+								inner join ui_reporte_reg r  on r.idreporte = re.idreporte
+									left join ui_tipo_operacion tp on tp.idtipo_operacion = r.idtipo_operacion
+								left join (select sum(rm.cantidad) as cant_1,rm.idreporte_reg from ui_reporte_mes rm where rm.idmes in (1,2,3) group by rm.idreporte_reg) m1 on m1.idreporte_reg = r.idreporte_reg
+								left join (select sum(rm.cantidad) as cant_2,rm.idreporte_reg from ui_reporte_mes rm where rm.idmes in (4,5,6) group by rm.idreporte_reg) m2 on m2.idreporte_reg = r.idreporte_reg
+								left join (select sum(rm.cantidad) as cant_3,rm.idreporte_reg from ui_reporte_mes rm where rm.idmes in (7,8,9) group by rm.idreporte_reg) m3 on m3.idreporte_reg = r.idreporte_reg
+								left join (select sum(rm.cantidad) as cant_4,rm.idreporte_reg from ui_reporte_mes rm where rm.idmes in (10,11,12) group by rm.idreporte_reg) m4 on m4.idreporte_reg = r.idreporte_reg
+								where re.idreporte = {$idr}) AS info) AS qry
+								) as sub1) AS sub2");
+
+		return \DB::select("SELECT sub2.*,sub2.prog_anual as inicial_1,sub2.mod_1 as inicial_2,sub2.mod_2 as inicial_3,sub2.mod_3 as inicial_4,((sub2.total_realizado * 100)/sub2.prog_anual) as total_porcentaje,(100-((sub2.total_realizado * 100)/sub2.prog_anual)) as porcentaje_restante FROM (
+			SELECT sub1.*,(sub1.cant_1 + sub1.cant_2 + sub1.cant_3 + sub1.cant_4) as total_realizado,
+			sub1.cant_1  as avance_1,(sub1.cant_1 + sub1.cant_2) as avance_2,((sub1.cant_1 + sub1.cant_2) + sub1.cant_3) as avance_3,(((sub1.cant_1 + sub1.cant_2) + sub1.cant_3) + sub1.cant_4) as avance_4
+			,(sub1.prog_anual + sub1.resta_1) as mod_1, ((sub1.prog_anual + sub1.resta_1) + sub1.resta_2) as mod_2, (((sub1.prog_anual + sub1.resta_1) + sub1.resta_2) + sub1.resta_3) as mod_3, ((((sub1.prog_anual + sub1.resta_1) + sub1.resta_2) + sub1.resta_3) + sub1.resta_4) as mod_4 FROM(
 				SELECT qry.idreporte_reg,qry.no_accion,qry.denominacion,qry.tipo_operacion,qry.frec_medicion,qry.descripcion,qry.unidad_medida,qry.obs1,qry.obs2,qry.obs3,qry.obs4,
 					qry.prog_anual,qry.trim_1,qry.trim_2,qry.trim_3,qry.trim_4,qry.cant_1,qry.cant_2,qry.cant_3,qry.cant_4,qry.por_1,qry.por_2,qry.por_3,qry.por_4,
 					(qry.cant_1 - qry.trim_1) as resta_1,(qry.cant_2 - qry.trim_2) as resta_2,(qry.cant_3 - qry.trim_3) as resta_3,(qry.cant_4 - qry.trim_4) as resta_4

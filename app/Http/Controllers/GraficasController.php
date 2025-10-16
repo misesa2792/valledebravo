@@ -104,7 +104,7 @@ class GraficasController extends Controller {
 		$this->data['info'] = json_encode($this->getRowsGraficaGeneral($r->idanio,$r->type));
 		$mpdf->SetHTMLHeader(View::make("graficas.pdfgeneral.header_banner", $this->data)->render());
 		// Establecer el encabezado y pie de página
-		$mpdf->SetHTMLFooter(View::make("graficas.pdfgeneral.footer_banner", $this->data)->render());
+		//$mpdf->SetHTMLFooter(View::make("graficas.pdfgeneral.footer_banner", $this->data)->render());
 		$mpdf->WriteHTML(view('graficas.pdfgeneral.pdf',$this->data));
 		
 		$time = time();
